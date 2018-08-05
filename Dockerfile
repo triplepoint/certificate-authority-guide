@@ -34,10 +34,16 @@ RUN mkdir -p -m 755 \
 
 COPY int_openssl.cnf /root/ca/intermediate/int_openssl.cnf
 
+# A quick helper script
+COPY archive_ca /usr/local/bin/archive_ca
+RUN chmod 755 /usr/local/bin/archive_ca
+
 # For convenience, make sure the bash shell
 # starts in the /root/ca directory
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
+
+VOLUME /root/ca_persist
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["bash"]

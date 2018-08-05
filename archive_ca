@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -ev
+
+tar -czvf /root/ca_authority.tar.gz -C /root/ca/ .
+cp /root/ca_authority.tar.gz /root/ca_persist
+
+tar -czvf /root/intermediate_authority.tar.gz -C /root/ca/intermediate/ .
+cp /root/intermediate_authority.tar.gz /root/ca_persist

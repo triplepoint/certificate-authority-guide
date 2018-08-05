@@ -29,8 +29,14 @@ cd ca-certificate-guide
 Then build the [`Dockerfile`](https://github.com/triplepoint/ca-certificate-guide/blob/master/Dockerfile) into an image and create a Docker instance from the image with the usual Docker commands:
 ``` shell
 docker build -t "ca-certificate-tools:latest" .
-docker run -it --rm ca-certificate-tools:latest
+
+mkdir -p ./archives
+docker run -it --rm  \
+    --mount type=bind,source="$(pwd)/archives",target="/root/ca_persist" \
+    ca-certificate-tools:latest
 ```
+Here we're creating and mounting a `./archives` directory as a Docker volume.  This will be used for persisting archives of the generated files between Docker containers.  You might instead choose to directly mount a USB drive.
+
 Be sure not to omit the `--rm` flag; this container will generate confidential files, and we want to destroy it once we've moved the generated confidential files to secure locations.
 
 Unless specified otherwise, the commands in the rest of this guide are executed inside the context of this Docker image.
@@ -136,8 +142,16 @@ We'll also package the intermediate authority's files into a separate archive at
 
 Be sure to store both key's passwords somewhere safe as well:
 ``` shell
-tar -czvf /root/ca_authority.tar -C /root/ca/ .
-tar -czvf /root/intermediate_authority.tar -C /root/ca/intermediate/ .
+tar -czvf /root/ca_authority.tar.gz -C /root/ca/ .
+cp /root/ca_authority.tar.gz /root/ca_persist
+
+tar -czvf /root/intermediate_authority.tar.gz -C /root/ca/intermediate/ .
+cp /root/intermediate_authority.tar.gz /root/ca_persist
+```
+
+Because this "export" behavior is critical, the above shell commands are also provided on the Docker image as ascript named `archive_ca`:
+``` shell
+archive_ca
 ```
 
 # Distributing the CA Certificate to Clients
@@ -146,6 +160,7 @@ TODO
 
 # Generating a Signed SSL/TLS Service Certificate
 TODO
+- SANs
 
 
 # Revoking a Service Certificate
