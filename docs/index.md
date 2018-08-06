@@ -1,6 +1,3 @@
----
----
-
 # Managing a Private Certificate Authority
 A typical office or enthusiast LAN will have several web services hosted on private domain names which only resolve on the LAN.  We'd like these services to use HTTPS, with SSL/TLS certificates which have valid chains of trust, but we don't want to get a real-world Certificate Authority (CA) involved in issuing our service certificates.
 
