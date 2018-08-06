@@ -20,3 +20,6 @@ Specifically, we want:
 - Various SSL/TLS service certificates, signed by the intermediate certificate, for each of the production services on the internal network.
 
 The rest of this site will go into detail on how to accomplish these goals, and some advice on maintaning it with a minimum of hassle.
+
+* TOC
+{:toc}
