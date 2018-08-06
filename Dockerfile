@@ -18,7 +18,7 @@ RUN mkdir -p -m 755 \
     && touch /root/ca/index.txt \
     && echo 1000 > /root/ca/serial
 
-COPY ca_openssl.cnf /root/ca/ca_openssl.cnf
+COPY conf/ca_root_openssl.cnf /root/ca/ca_openssl.cnf
 
 # Prepare the intermediate certificate workspace
 RUN mkdir -p -m 755 \
@@ -32,15 +32,15 @@ RUN mkdir -p -m 755 \
     && echo 1000 > /root/ca/intermediate/serial \
     && echo 1000 > /root/ca/intermediate/crlnumber
 
-COPY int_openssl.cnf /root/ca/intermediate/int_openssl.cnf
+COPY conf/ca_intermediate_openssl.cnf /root/ca/intermediate/int_openssl.cnf
 
 # A quick helper script
-COPY archive_ca /usr/local/bin/archive_ca
+COPY scripts/archive_ca /usr/local/bin/archive_ca
 RUN chmod 755 /usr/local/bin/archive_ca
 
 # For convenience, make sure the bash shell
 # starts in the /root/ca directory
-COPY entrypoint.sh /entrypoint.sh
+COPY scripts/entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
 VOLUME /root/ca_persist
