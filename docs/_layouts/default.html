@@ -31,32 +31,30 @@
 
     <div class="wrapper">
 
-      <nav class="menu">
-        <ul>
-          <li><a href="./index.html">Introduction</a></li>
-          <li><a href="./details_and_setup.html">More Details, and a Working Environment</a></li>
-          <li><a href="./generating_ca.html">Generating a Certificate Authority</a></li>
-          <li><a href="./distribution.html">Distribution</a></li>
-          <li><a href="./service_certificates.html">Service Certificates</a></li>
-          <li><a href="./revocation_services.html">Revoking Service Certificates</a></li>
-          <li><a href="./revocation_ca.html">Revoking the Intermediate CA Certificate</a></li>
-          <li><a href="./references.html">References</a></li>
-        </ul>
+      <nav>
+        {% for item in site.data.navigation %}
+          <a href="{{ item.link }}" {% if item.link == page.url %}class="active"{% endif %}>
+            {{ item.name }}
+          </a>
+        {% endfor %}
       </nav>
 
       <section>
         <div id="title">
           <h1>{{ site.title | default: site.github.repository_name }}</h1>
           <p>{{ site.description | default: site.github.project_tagline }}</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
         </div>
 
         {{ content }}
 
       </section>
 
+    </div>
+
+    <div id="footer">
+        <hr />
+        <span class="credits left">Project maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></span>
+        <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
     </div>
 
     {% if site.google_analytics %}
