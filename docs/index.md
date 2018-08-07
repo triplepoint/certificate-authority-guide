@@ -1,6 +1,5 @@
 ---
 title: Managing a Private Certificate Authority
-layout: default
 ---
 
 # Introduction

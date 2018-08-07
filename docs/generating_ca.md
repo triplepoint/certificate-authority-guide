@@ -1,6 +1,6 @@
 ---
 title: Generating a new Certificate Authority
-layout: default
+toc: true
 ---
 
 # Generating a Root CA Certificate

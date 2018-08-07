@@ -1,6 +1,5 @@
 ---
 title: References
-layout: default
 ---
 
 # References

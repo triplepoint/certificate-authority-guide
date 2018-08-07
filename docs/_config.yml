@@ -1,1 +1,9 @@
-theme: jekyll-theme-midnight
+remote_theme: "mmistakes/minimal-mistakes"
+minimal_mistakes_skin: "dirt"
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "single"
+      sidebar:
+        nav: "site"

@@ -1,16 +1,24 @@
-- link: ./index.html
-  name: Introduction
-- link: ./details_and_setup.html
-  name: More Details, and a Working Environment
-- link: ./generating_ca.html
-  name: Generating a Certificate Authority
-- link: ./distribution.html
-  name: Distribution
-- link: ./service_certificates.html
-  name: Service Certificates
-- link: ./revocation_services.html
-  name: Revoking Service Certificates
-- link: ./revocation_ca.html
-  name: Revoking the Intermediate CA Certificate
-- link: ./references.html
-  name: References
+site:
+- url: /index.html
+  title: Introduction
+
+- url: /details_and_setup.html
+  title: More Details, and a Working Environment
+
+- url: /generating_ca.html
+  title: Generating a Certificate Authority
+
+- url: /distribution.html
+  title: Distribution
+
+- url: /service_certificates.html
+  title: Service Certificates
+
+- url: /revocation_services.html
+  title: Revoking Service Certificates
+
+- url: /revocation_ca.html
+  title: Revoking the Intermediate CA Certificate
+
+- url: /references.html
+  title: References

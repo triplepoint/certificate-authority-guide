@@ -1,6 +1,5 @@
 ---
 title: More Details, and a Working Environment
-layout: default
 ---
 
 # Operating Plan Details

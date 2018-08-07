@@ -1,6 +1,5 @@
 ---
 title: Generating new Service Certificates
-layout: default
 ---
 
 # Generating a Signed SSL/TLS Service Certificate
