@@ -1,7 +1,11 @@
 ---
-title: Setting Up a Working Environment
+title: More Details, and a Working Environment
 layout: default
 ---
+
+# Operating Plan Details
+TODO - talk about the database, and archiving
+
 
 # Getting a Docker Execution Environment
 In order to contain the infrastructure for provisioning these certificates, we'll build a Docker container in which we'll execute the various commands.

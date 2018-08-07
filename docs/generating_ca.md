@@ -3,7 +3,7 @@ title: Generating a new Certificate Authority
 layout: default
 ---
 
-# Generating a CA Certificate and an Intermediate Certificate
+# Generating a Root CA Certificate
 A pre-configured `ca_openssl.cnf` file is provided, but it's worth reviewing it and the associated man pages (see the References section below), to understand the details of what's happening.
 
 ## Generate a New Key for the CA Certificate
@@ -39,6 +39,8 @@ chmod 400 /root/ca/intermediate/private/intermediate.key.pem
 ```
 This generates the new intermediate certificate key at: `/root/ca/intermediate/private/intermediate.key.pem`.
 
+
+# Generating an Intermediate CA Certificate
 ## Generate a Certificate Signing Request (CSR) for the Intermediate Certificate
 This document represents a request to the root CA to generate the intermediate certificate.
 
@@ -76,7 +78,8 @@ openssl verify -CAfile /root/ca/certs/ca.cert.pem \
     /root/ca/intermediate/certs/intermediate.cert.pem
 ```
 
-## Creating a Chain File
+
+# Creating a Chain File
 It's often convenient to have a combined "chain file" for a given service certificate's chain of trust back to a trusted root certificate.  Many SSL/TLS configurations expect to have these files.
 
 These chain files are simply the concatenated set of all the certificates in the chain of trust which lead back to the trusted CA root certificate:
@@ -87,7 +90,8 @@ cat /root/ca/intermediate/certs/intermediate.cert.pem \
 chmod 444 /root/ca/intermediate/certs/ca-chain.cert.pem
 ```
 
-## Safe Storage
+
+# Safe Storage
 The above work has generated several files which need to be preserved:
 - The CA certificate and its key file
 - The intermediate certificate and its keyfile
