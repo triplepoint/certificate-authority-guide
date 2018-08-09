@@ -2,7 +2,7 @@
 title: More Details, and a Working Environment
 ---
 
-# Operating Plan Details
+# Operating Plan
 TODO - talk about the database, and archiving
 
 
