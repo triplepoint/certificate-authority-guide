@@ -2,7 +2,7 @@ site:
 - title: Introduction
   url: ./
 
-- title: More Details, and a Working Environment
+- title: Operational Overview and Setup
   url: ./details_and_setup.html
 
 - title: Generating a Certificate Authority
