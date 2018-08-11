@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-set -ev
+set -e
 
-tar -czvf /root/ca_authority.tar.gz -C /root/ca/ .
-cp /root/ca_authority.tar.gz /root/ca_persist
+# TODO rotate the existing archive to a backup, so we're not potentially destroying important data
 
-tar -czvf /root/intermediate_authority.tar.gz -C /root/ca/intermediate/ .
-cp /root/intermediate_authority.tar.gz /root/ca_persist
+# Archive the entire CA, and also just the intermediate CA
+tar -czvf /root/ca_persist/ca_authority.tar.gz -C /root/ca/ .
+tar -czvf /root/ca_persist/intermediate_authority.tar.gz -C /root/ca/intermediate/ .

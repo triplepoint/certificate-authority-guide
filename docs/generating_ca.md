@@ -4,10 +4,12 @@ toc: true
 ---
 
 # Generating a Root CA Certificate
-A pre-configured `ca_openssl.cnf` file is provided, but it's worth reviewing it and the associated man pages (see the References section below), to understand the details of what's happening.
+The Certificate Authority's core documents are its certificate and the private key used to sign it.  This is the certificate which all clients will directly trust, and its the root of the chain of trust that ultimately extends down to the individual service certificates.
+
+You'll likely only need to generate this root certificate once.  We'll set the expiration for 20 years (7300 days), and as long as the certificate isn't compromised you can rely on it to function for that long.
 
 ## Generate a New Key for the CA Certificate
-You'll want to use a real non-empty password for this certificate and store it in a safe place, just in case the key file itself is ever compromised.
+You'll want to use a real non-empty password for this key and store it in a safe place, just in case the key file itself is ever compromised.
 ``` shell
 openssl genrsa -aes256 -out /root/ca/private/ca.key.pem 4096 && \
 chmod 400 /root/ca/private/ca.key.pem

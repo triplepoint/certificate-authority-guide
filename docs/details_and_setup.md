@@ -37,7 +37,7 @@ docker run -it --rm  \
 
 In the above `docker run` command, the `--mount` parameter is defining a local `source` directory to mount as `/root/ca_persist` inside the Docker container.  This directory shared between the host machine and the Docker container is how we'll move the CA archives in and out of the container.
 
-If the `source` directory on the host has the `ca_authority.tar.gz` and/or `intermediate_authority.tar.gz` files present, then these pre-existing archives will be unpacked into the /root working directory on the Docker container when the container is created.  If these archives are missing, then a skeleton directory structure will be prepared.
+If the `source` directory on the host has the `ca_authority.tar.gz` and/or `intermediate_authority.tar.gz` files present, then these pre-existing archives will be unpacked into the /root working directory on the Docker container when the container is created.  If these archives are missing, then a skeleton directory structure will be prepared.  Note that the root CA authority archive contains the intermediate CA authority archive, and if both are present, the root CA authority will take precedence.
 
 Remember, it's your responsibility to ensure that new work done inside the Docker container is archived _before_ the container is exited and destroyed.
 
