@@ -4,7 +4,7 @@
 
 [ ca ]
 # The name of the default ca section
-default_ca = CA_intermediate
+default_ca = CA_default
 
 [ CA_root ]
 # Configuration for the Root Certificate Authority.

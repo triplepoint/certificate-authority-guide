@@ -30,7 +30,7 @@ else
     touch ./index.txt
     echo 1000 > ./serial
     echo 1000 > ./crlnumber
-    cp /opt/ca/int_openssl.cnf ./
+    cp /opt/ca/ca_openssl.cnf ./
 fi
 
 cd /root/ca

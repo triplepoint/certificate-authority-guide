@@ -14,10 +14,9 @@ RUN apt-get update && apt-get install -y \
         vim \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy over the stock prepared OpenSSL config files
-# Note that these will only be used if the archives don't have their own copies
-COPY conf/ca_root_openssl.cnf /opt/ca/ca_openssl.cnf
-COPY conf/ca_intermediate_openssl.cnf /opt/ca/int_openssl.cnf
+# Copy over the stock prepared OpenSSL config file
+# Note that this will only be used if the archives don't have their own copies
+COPY conf/ca_openssl.cnf /opt/ca/ca_openssl.cnf
 
 # A quick helper script for generating archives
 COPY scripts/archive_ca /usr/local/bin/archive_ca
