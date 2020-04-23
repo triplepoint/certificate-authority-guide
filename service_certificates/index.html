@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  
+  <meta name="author" content="Jonathan Hanson">
   
   <link rel="shortcut icon" href="../img/favicon.ico">
   <title>Service Certificates - Certificate Authority Guide</title>
@@ -60,7 +60,7 @@
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../distribution/">Distribution</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../distribution/">Root Certificate Distribution</a>
                     </li>
                 </ul>
                 <ul class="current">
@@ -105,6 +105,9 @@
     <li>Service Certificates</li>
     <li class="wy-breadcrumbs-aside">
       
+        <a href="https://github.com/triplepoint/certificate-authority-guide/blob/master/mkdocs/docs/service_certificates.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
     </li>
   </ul>
   
@@ -114,8 +117,8 @@
             <div class="section">
               
                 <h1 id="generating-a-signed-ssltls-service-certificate">Generating a Signed SSL/TLS Service Certificate</h1>
-<p>The above instructions for generating the root CA certificate and the intermediate certificate were complex, but since they are seldom performed that should be acceptable.</p>
-<p>In contrast, the procedure for requesting a new service certificate from the internal CA could happen frequently.  We'll need to provide some automation in order to avoid mistakes and reduce labor.</p>
+<p>The instructions introduced so far for generating the root CA certificate and the intermediate certificate were complex, but since they are seldom performed that should be acceptable.</p>
+<p>In contrast, the procedure for requesting a new service certificate from your CA could happen frequently.  We'll need to provide some automation in order to avoid mistakes and reduce labor.</p>
 <p>We'll go through this process once manually, for explanation's sake, and then we'll introduce a script that does the same thing, but quicker and easier.</p>
 <p>TODO
 - SANs</p>
@@ -129,7 +132,7 @@
         <a href="../revocation_services/" class="btn btn-neutral float-right" title="Revoking Service Certificates">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../distribution/" class="btn btn-neutral" title="Distribution"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../distribution/" class="btn btn-neutral" title="Root Certificate Distribution"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -153,6 +156,8 @@
 
   <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/triplepoint/certificate-authority-guide/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
         <span><a href="../distribution/" style="color: #fcfcfc;">&laquo; Previous</a></span>

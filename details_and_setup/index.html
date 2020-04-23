@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  
+  <meta name="author" content="Jonathan Hanson">
   
   <link rel="shortcut icon" href="../img/favicon.ico">
   <title>Operational Overview and Setup - Certificate Authority Guide</title>
@@ -62,7 +62,7 @@
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../distribution/">Distribution</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../distribution/">Root Certificate Distribution</a>
                     </li>
                 </ul>
                 <ul>
@@ -105,6 +105,9 @@
     <li>Operational Overview and Setup</li>
     <li class="wy-breadcrumbs-aside">
       
+        <a href="https://github.com/triplepoint/certificate-authority-guide/blob/master/mkdocs/docs/details_and_setup.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
     </li>
   </ul>
   
@@ -116,35 +119,37 @@
                 <h1 id="operational-overview">Operational Overview</h1>
 <p>The <a href="https://www.openssl.org/docs/man1.1.0/apps/openssl.html">OpenSSL command line tool</a> is the intimidating Swiss Army knife that performs practically all of the functions necessary for running a CA.  We'll only use a fraction of its features for this project.</p>
 <p>In addition to generating keys and certificates and handling signing requests, OpenSSL can maintain a database of all the issued certificates signed by the CA.  Also, an incrementing serial number for issued certs can be kept to aid in auditing.  The database of issued certs and the serial number state are stored in text files alongside the certificates they describe, and these files will need to be preserved together with the CA certificates.</p>
-<p>To do so, we'll generate one archive of the entire CA working set (<code>ca_authority.tar.gz</code>), and another for just the subset of files defining the intermediate certificate (<code>intermediate_authority.tar.gz</code>).  These archives can then be backed up and stored in separate safe locations between uses.</p>
+<p>To do so, we'll generate one archive of the entire CA working set (<code>ca_authority.tar.gz</code>), and another for just the subset of files defining the intermediate certificate (<code>intermediate_authority.tar.gz</code>).  These archives can then be stored in separate safe locations between uses, allowing the less-risky intermediate authority certificate to be used to sign service certificates, without having to risk exposing the more dangerous root certificate.</p>
 <h1 id="setting-up-a-docker-working-environment">Setting Up a Docker Working Environment</h1>
 <p>In order to provide a self-contained repeatable infrastructure for operating the CA, we'll use Docker containers with the necessary tools pre-installed.  These containers can be destroyed and regenerated between CA duties, <em>as long as we're careful to archive the work done at the end of each session</em>.  We'll cover the details of doing so later in this guide.</p>
 <p>Setting up a Docker host environment on your computer is beyond the scope of this document, but it's not especially difficult.  A good place to start is the <a href="https://www.docker.com/community-edition">Docker Community Edition website</a>.</p>
 <p>Once you've got Docker installed, clone this site's code repository to a working directory:</p>
-<pre><code class="shell">git clone https://github.com/triplepoint/ca-certificate-guide
+<pre><code class="shell">git clone https://github.com/triplepoint/certificate-authority-guide
 
-cd ca-certificate-guide
+cd certificate-authority-guide/src
 </code></pre>
 
-<p>Then build the <a href="https://github.com/triplepoint/ca-certificate-guide/blob/master/Dockerfile"><code>Dockerfile</code></a> into a Docker image and create a Docker instance from that image with the typical Docker commands:</p>
-<pre><code class="shell"># Create a shared directory for exposing the CA archives inside the container
-mkdir -p ./archives
-
-# Generate a Docker image from the provided Dockerfile
+<p>Then build the <a href="https://github.com/triplepoint/certificate-authority-guide/blob/master/src/Dockerfile"><code>Dockerfile</code></a> into a Docker image and create a Docker instance from that image with the typical Docker commands:</p>
+<pre><code class="shell"># Generate a Docker image from the provided Dockerfile
 docker build -t &quot;ca-certificate-tools:latest&quot; .
 
-# Start a Docker container from the image we generated above
+# Create a shared directory for exposing the CA archives inside the container
+mkdir -p ./archives
+
+# Start a Docker container from the image we generated above, with a mounted
+# volume into the shared directory we created above
 docker run -it --rm  \
     --mount type=bind,source=&quot;$(pwd)/archives&quot;,target=&quot;/root/ca_persist&quot; \
     ca-certificate-tools:latest
 </code></pre>
 
-<p>In the above <code>docker run</code> command, the <code>--mount</code> parameter is defining a local <code>source</code> directory to mount as <code>/root/ca_persist</code> inside the Docker container.  This directory shared between the host machine and the Docker container is how we'll move the CA archives in and out of the container.</p>
-<p>If the <code>source</code> directory on the host has the <code>ca_authority.tar.gz</code> and/or <code>intermediate_authority.tar.gz</code> files present, then these pre-existing archives will be unpacked into the /root working directory on the Docker container when the container is created.  If these archives are missing, then a skeleton directory structure will be prepared.  Note that the root CA authority archive contains the intermediate CA authority archive, and if both are present, the root CA authority will take precedence.</p>
-<p>Remember, it's your responsibility to ensure that new work done inside the Docker container is archived <em>before</em> the container is exited and destroyed.</p>
-<p>Note that in the command example above, we're creating a local <code>./archives</code> directory to use as the <code>source</code> archive directory on the host.  You could instead provide the path to a mounted USB drive and avoid copying the archives onto your computer.  Note that Docker requires that path to be an absolute path.</p>
-<p>Be sure not to omit the <code>--rm</code> flag; this container will generate confidential files, and we want to destroy it once we've moved the archived files to secure locations.</p>
-<p>Unless specified otherwise, the commands in the rest of this guide are executed inside the context of this Docker image.</p>
+<p>In the above <code>docker run</code> command, the <code>--mount</code> parameter is defining a local <code>source</code> directory (<code>./archives</code>) to mount as <code>/root/ca_persist</code> inside the Docker container.  This directory, shared between the host machine and the Docker container, is how we'll move the CA archives in and out of the container.</p>
+<p>When the above command is run, you'll have a bash shell into that new container, in the container's <code>/root/ca</code> directory.  This is the working directory in which all the CA management work will take place.  The idea is that whatever work happens in here can be archived and moved (within the container) to <code>/root/ca_persist</code>, which will preserve it on the host machine after the container is terminated.</p>
+<p>If the shared mount directory already has the <code>ca_authority.tar.gz</code> and/or <code>intermediate_authority.tar.gz</code> files present when the container is created, then these pre-existing archives will be unpacked into the <code>/root/ca</code> working directory on the Docker container when the container is created.  If both these archives are missing, then a new skeleton directory structure will be prepared.  Note that the root CA authority archive also contains the contents of the intermediate CA authority archive, and if both archive files are present in the shared mount, the root CA authority will take precedence.  See the Docker image's <a href="https://github.com/triplepoint/certificate-authority-guide/blob/master/src/scripts/entrypoint.sh"><code>entrypoint.sh</code></a> file for more details about what happens when the Docker container is created.</p>
+<p>Remember, it's your responsibility to ensure that new work done inside the Docker container is archived <em>before</em> the container is exited and destroyed.  We'll explain more about how to do this later in this guide.</p>
+<p>Note that in the command example above, we're creating a local <code>./archives</code> directory to use as the <code>source</code> archive directory on the host.  You could instead provide the path to a mounted USB drive and avoid copying the archives onto your computer.  Be aware that Docker requires that path to be an absolute path.</p>
+<p>Be sure not to omit the <code>--rm</code> flag; this container will generate confidential files, and we want to destroy it once we're done working inside the container and have safely re-created the archives.</p>
+<p>Unless specified otherwise, the commands in the rest of this guide are executed inside the context of this Docker container's bash shell.</p>
               
             </div>
           </div>
@@ -179,6 +184,8 @@ docker run -it --rm  \
 
   <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/triplepoint/certificate-authority-guide/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
         <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>

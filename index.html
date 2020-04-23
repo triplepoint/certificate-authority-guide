@@ -5,8 +5,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="None">
-  
+  <meta name="description" content="A guide to managing a Certificate Authority, as would be used on a private LAN with private domains.">
+  <meta name="author" content="Jonathan Hanson">
   
   <link rel="shortcut icon" href="img/favicon.ico">
   <title>Certificate Authority Guide</title>
@@ -62,7 +62,7 @@
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="distribution/">Distribution</a>
+                    <li class="toctree-l1"><a class="reference internal" href="distribution/">Root Certificate Distribution</a>
                     </li>
                 </ul>
                 <ul>
@@ -105,6 +105,9 @@
     <li>Introduction</li>
     <li class="wy-breadcrumbs-aside">
       
+        <a href="https://github.com/triplepoint/certificate-authority-guide/blob/master/mkdocs/docs/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
     </li>
   </ul>
   
@@ -117,21 +120,22 @@
 <p>A typical office or enthusiast LAN will have several web services hosted internally, with private domain names resolved by a private DNS server.  We'd like these services to use HTTPS, with SSL/TLS certificates which have valid chains of trust, but we don't want to get a real-world Certificate Authority (CA) involved in issuing our private service certificates.</p>
 <p>The solution is to create our own CA.  This entity will represent a new root point of trust which our service clients can explicitly accept, and which can extend its trust to the various internal web service SSL/TLS certificates.</p>
 <p>However, this plan has important implications for security and privacy.  Trusting any CA implies that any certificate signed by that CA is also trusted.  This broad trust could be exploited to issue fraudulent certificates for 3rd party domains if, say, the CA certificate and key were stolen, or if the agency which controls the CA chose to undermine the privacy and security of the clients who trusted it.</p>
-<p>In order to mitigate this risk, we'd like to limit the CA such that its trust only extends to domains which match a given whitelist.  Clients can then verify this condition by inspecting the CA certificate before trusting it, and be assured that, at worst, their risk extends only to a limited set of internal domains.</p>
+<p>In order to mitigate this risk, we'd like to limit the CA such that its trust only extends to domains which match a given whitelist.  Clients can then verify this condition by inspecting the CA certificate before trusting it, and be assured that, at worst, their risk extends only to a limited set of private domains.</p>
 <p>In addition, we'd like to find a balance between convenience and security when it comes to handling the CA's confidential files.  To do so, while still enabling convenient signing of new service certificates, we'll create an intermediate certificate signed by the root CA certificate, which is then used for signing the various web service certificates.</p>
 <p>This structuring of the CA into a root and an intermediate certificate will allow us to avoid frequent access to the root CA certificate's key.  It will also give us a trusted entity from which to revoke the intermediate CA certificate if it were compromised.  And finally, the intermediate certificate can have a relatively short expiration date, with a replacement intermediate certificate being rotated into usage near the existing one's end of life, without having to re-issue a trusted certificate for all the clients.</p>
 <p>In summary, we want:</p>
 <ul>
 <li>
-<p>A single long-lived root CA certificate, limited to just internal production domains with <a href="https://tools.ietf.org/html/rfc5280#section-4.2.1.10">X.509 Name Constraints</a>, which can be trusted by internal clients.</p>
+<p>A single long-lived root CA certificate, limited to just an agreed-upon set of domains with <a href="https://tools.ietf.org/html/rfc5280#section-4.2.1.10">X.509 Name Constraints</a>, which can be safely trusted by clients.</p>
 </li>
 <li>
 <p>An intermediate CA certificate, signed by the root CA certificate.</p>
 </li>
 <li>
-<p>Various SSL/TLS service certificates for each of the production services on the internal network, signed by the intermediate CA certificate.</p>
+<p>Various SSL/TLS service certificates for each of the production services on the private network, signed by the intermediate CA certificate.</p>
 </li>
 </ul>
+<p>In addition, we'd like some process and tooling for securely and conveniently managing our new Certificate Authority.  Ideally, this would be a small set of archive files we could store securely somewhere, and some stateless tooling scripts that can operate on those archives to perform the various certificate maintenance tasks.</p>
 <p>The rest of this guide will go into detail on how to accomplish these goals, and some advice on maintaining it with a minimum of hassle.</p>
               
             </div>
@@ -166,6 +170,8 @@
   <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
+          <a href="https://github.com/triplepoint/certificate-authority-guide/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
       
       
         <span style="margin-left: 15px"><a href="details_and_setup/" style="color: #fcfcfc">Next &raquo;</a></span>
@@ -186,5 +192,5 @@
 
 <!--
 MkDocs version : 1.1
-Build Date UTC : 2020-04-23 01:08:56
+Build Date UTC : 2020-04-23 23:23:05
 -->
