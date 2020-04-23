@@ -1,5 +1,8 @@
 # Intro
-This repository contains the documentation and code for the [related GitHub Pages documents](https://triplepoint.github.io/certificate-authority-guide/).
+This repository contains documentation for running your own limited certificate authority, plus a few tools for making the process easier.  See the rendered documentation at the [related GitHub Pages site](https://triplepoint.github.io/certificate-authority-guide/).
+
+- `/mkdocs` - raw Markdown files for the documentation site
+- `/src` - The Dockerfile and supporting scripts and config files mentioned in the documents
 
 # Doc Development
 The `/mkdocs` folder contains a [MkDocs](https://www.mkdocs.org) project, suitable for being built and published to GitHub Pages.
