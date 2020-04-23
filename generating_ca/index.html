@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Generating a Certificate Authority - Certificate Authority Guide</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Generating a Certificate Authority";
+    var mkdocs_page_input_path = "generating_ca.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Certificate Authority Guide</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../details_and_setup/">Operational Overview and Setup</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Generating a Certificate Authority</a>
+    <ul class="current">
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../distribution/">Distribution</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../service_certificates/">Service Certificates</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../revocation_services/">Revoking Service Certificates</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../revocation_ca/">Revoking the Intermediate CA Certificate</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../references/">References</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Certificate Authority Guide</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Generating a Certificate Authority</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="a-note-on-the-openssl-config-files">A Note on the OpenSSL Config Files</h1>
+<p>We've provided a copy of the openssl config file in both the <code>/root/ca</code> and <code>/root/ca/intermediate</code> directory.  These files are identical, but they're duplicated to ensure that the intermediate CA archive has its own copy if it's ever used on its own (for example, when signing a service certificate).</p>
+<p>We'll be careful to explicitly set the openssl <code>-config</code> and <code>-name</code> flags appropriately for each scenario, but just be aware these two files are (or at least should be) identical.</p>
+<h1 id="generating-a-root-ca-certificate">Generating a Root CA Certificate</h1>
+<p>The Certificate Authority's core documents are its certificate and the associated private key.  This is the certificate which all clients will directly trust, and its the root of the chain of trust that ultimately extends down to the individual service certificates.</p>
+<p>You'll likely only need to generate this root certificate and its key once.  We'll set the expiration for 20 years (7300 days), and as long as the certificate isn't compromised you can rely on it to function for that long.</p>
+<h2 id="generate-a-new-key-and-certificate-signing-request-for-the-ca-certificate">Generate a New Key and Certificate Signing Request for the CA Certificate</h2>
+<p>Here we'll generate a new RSA key for the CA certificate, and also a Certificate Signing Request (CSR) which will be define the details of the CA certificate, and which will be used to self-sign the new certificate.</p>
+<p>The key will be encrypted with a passphrase, which you'll be prompted to supply.  You'll want to use a real non-empty password for this key and store it in a safe place.</p>
+<p>When you are prompted for the CA Certificate Distinguished Name details, take care to get them right.  You won't want to regenerate the certificate after its been distributed.</p>
+<pre><code class="shell">openssl req \
+    -config /root/ca/ca_openssl.cnf \
+    -new \
+    -newkey rsa:4096 \
+    -keyout /root/ca/private/ca.key.pem \
+    -out /root/ca/ca.req.pem
+</code></pre>
+
+<p>This generates the new CA certificate key at <code>/root/ca/private/ca.key.pem</code> and  generates the new CSR for the root certificate at <code>/root/ca/ca.req.pem</code>.</p>
+<h2 id="self-sign-the-root-certificate">Self-Sign the Root Certificate</h2>
+<pre><code class="shell">openssl ca \
+    -config /root/ca/ca_openssl.cnf \
+    -name CA_root \
+    -in /root/ca/ca.req.pem \
+    -create_serial \
+    -out /root/ca/certs/ca.cert.pem \
+    -days 7300 \
+    -keyfile /root/ca/private/ca.key.pem \
+    -selfsign \
+    -extensions v3_ca
+</code></pre>
+
+<p>This generates the new CA certificate at <code>/root/ca/certs/ca.cert.pem</code>.</p>
+<h2 id="verifying-the-root-certificate">Verifying the Root Certificate</h2>
+<p>Now that the root CA certificate and key are generated, you can verify them with:</p>
+<pre><code class="shell">openssl x509 -noout -text -in /root/ca/certs/ca.cert.pem
+</code></pre>
+
+<p>TODO - what are we looking at?</p>
+<h2 id="generate-a-new-key-for-the-intermediate-certificate">Generate a New Key for the Intermediate Certificate</h2>
+<p>Just like we did for the CA certificate above:</p>
+<pre><code class="shell">openssl genrsa \
+    -aes256 \
+    -out /root/ca/intermediate/private/intermediate.key.pem \
+    4096 &amp;&amp; \
+chmod 400 /root/ca/intermediate/private/intermediate.key.pem
+</code></pre>
+
+<p>This generates the new intermediate certificate key at: <code>/root/ca/intermediate/private/intermediate.key.pem</code>.</p>
+<h1 id="generating-an-intermediate-ca-certificate">Generating an Intermediate CA Certificate</h1>
+<h2 id="generate-a-certificate-signing-request-csr-for-the-intermediate-certificate">Generate a Certificate Signing Request (CSR) for the Intermediate Certificate</h2>
+<p>This document represents a request to the root CA to generate the intermediate certificate.</p>
+<p>Note that the <code>Country Name</code>, <code>State or Province Name</code>, and <code>Organization Name</code> all have to match the values of the CA certificate.</p>
+<p>Also note that the Common Name used in this CSR <em>must</em> be distinct from the CA certificate's Common Name, used above.</p>
+<pre><code class="shell">openssl req \
+    -config /root/ca/intermediate/int_openssl.cnf \
+    -key /root/ca/intermediate/private/intermediate.key.pem \
+    -new \
+    -sha256 \
+    -out /root/ca/intermediate/csr/intermediate.csr.pem
+</code></pre>
+
+<h2 id="sign-the-intermediate-certificate-with-the-ca-certificate">Sign the Intermediate Certificate with the CA Certificate</h2>
+<p>Answer <code>y</code> to any prompts about "commiting", this is about the database of signed certificates that OpenSSL is keeping for us (see below).</p>
+<pre><code class="shell">openssl ca \
+    -config /root/ca/ca_openssl.cnf \
+    -extensions v3_intermediate_ca \
+    -days 3650 \
+    -notext \
+    -md sha256 \
+    -in /root/ca/intermediate/csr/intermediate.csr.pem \
+    -out /root/ca/intermediate/certs/intermediate.cert.pem &amp;&amp; \
+chmod 444 /root/ca/intermediate/certs/intermediate.cert.pem
+</code></pre>
+
+<p>This generates the new Intermdiate certificate at: <code>/root/ca/intermediate/certs/intermediate.cert.pem</code>.</p>
+<p>Once generated, you can verify the certificate's values with:</p>
+<pre><code class="shell">openssl x509 -noout -text -in /root/ca/intermediate/certs/intermediate.cert.pem
+</code></pre>
+
+<p>And you can verify the intermediate certificate's chain of trust against the CA certificate is valid with:</p>
+<pre><code class="shell">openssl verify -CAfile /root/ca/certs/ca.cert.pem \
+    /root/ca/intermediate/certs/intermediate.cert.pem
+</code></pre>
+
+<h1 id="creating-a-chain-file">Creating a Chain File</h1>
+<p>It's often convenient to have a combined "chain file" for a given service certificate's chain of trust back to a trusted root certificate.  Many SSL/TLS configurations expect to have these files.</p>
+<p>These chain files are simply the concatenated set of all the certificates in the chain of trust which lead back to the trusted CA root certificate:</p>
+<pre><code class="shell">cat /root/ca/intermediate/certs/intermediate.cert.pem \
+    /root/ca/certs/ca.cert.pem &gt; \
+    /root/ca/intermediate/certs/ca-chain.cert.pem &amp;&amp; \
+chmod 444 /root/ca/intermediate/certs/ca-chain.cert.pem
+</code></pre>
+
+<h1 id="safe-storage">Safe Storage</h1>
+<p>The above work has generated several files which need to be preserved:
+- The CA certificate and its key file
+- The intermediate certificate and its keyfile
+- A chainfile combining both certs
+- A set of <code>index.txt*</code> and <code>serial*</code> files, one for each of the two CA certificates, which track what certificates have been signed with which CA certificates
+- The <code>*openssl.cnf</code> files, one for each CA certificate, which configured OpenSSL during the various operations</p>
+<p>These files need to be packaged and prepared for storage.</p>
+<p>We'll package the entire set up into one archive at <code>/root/ca_authority.tar</code> which can represent the CA certificate, and which can be stored in a seldom-accessed, higher-security site.</p>
+<p>We'll also package the intermediate authority's files into a separate archive at <code>/root/intermediate_authority.tar</code>, which can be stored in the more-convenient, less-secure site.</p>
+<p>Be sure to store both key's passwords somewhere safe as well:</p>
+<pre><code class="shell">tar -czvf /root/ca_authority.tar.gz -C /root/ca/ .
+cp /root/ca_authority.tar.gz /root/ca_persist
+
+tar -czvf /root/intermediate_authority.tar.gz -C /root/ca/intermediate/ .
+cp /root/intermediate_authority.tar.gz /root/ca_persist
+</code></pre>
+
+<p>Because this "export" behavior is critical, the above shell commands are also provided on the Docker image as ascript named <code>archive_ca</code>:</p>
+<pre><code class="shell">archive_ca
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../distribution/" class="btn btn-neutral float-right" title="Distribution">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../details_and_setup/" class="btn btn-neutral" title="Operational Overview and Setup"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../details_and_setup/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../distribution/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
