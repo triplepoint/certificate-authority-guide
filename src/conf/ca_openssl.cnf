@@ -2,10 +2,16 @@
 # see:
 # https://www.openssl.org/docs/manmaster/man1/ca.html
 
-[ ca ]
-# The name of the default ca section
-default_ca = CA_default
+# This definition stops the following lines choking if HOME isn't
+# defined.
+HOME			= .
+RANDFILE		= $ENV::HOME/.rnd
 
+####################################################################
+[ ca ]
+default_ca	= CA_default		# The default ca section
+
+####################################################################
 [ CA_root ]
 # Configuration for the Root Certificate Authority.
 
@@ -88,6 +94,7 @@ organizationalUnitName  = optional
 commonName              = supplied
 emailAddress            = optional
 
+####################################################################
 [ req ]
 # Options for the `req` tool (`man req`).
 default_bits        = 2048

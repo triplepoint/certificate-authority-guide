@@ -1,5 +1,5 @@
 FROM ubuntu:bionic
-MAINTAINER Jonathan Hanson "jonathan@jonathan-hanson.org"
+LABEL maintainer="Jonathan Hanson <jonathan@jonathan-hanson.org>"
 
 # The path on the container where CA archives are written and read
 ENV CA_ARCHIVE_DIR /root/ca_persist

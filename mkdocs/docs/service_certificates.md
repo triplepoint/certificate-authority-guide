@@ -1,7 +1,3 @@
----
-title: Generating new Service Certificates
----
-
 # Generating a Signed SSL/TLS Service Certificate
 The above instructions for generating the root CA certificate and the intermediate certificate were complex, but since they are seldom performed that should be acceptable.
 

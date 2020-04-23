@@ -1,2 +1,4 @@
 /archives/
-/_site/
+
+# mkdocs build artifacts
+/mkdocs/site/

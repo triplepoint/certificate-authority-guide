@@ -1,13 +1,9 @@
----
-title: Operational Overview and Setup
----
-
 # Operational Overview
 The [OpenSSL command line tool](https://www.openssl.org/docs/man1.1.0/apps/openssl.html) is the intimidating Swiss Army knife that performs practically all of the functions necessary for running a CA.  We'll only use a fraction of its features for this project.
 
-In addition to generating keys and certificates and handling signing requests, OpenSSL can maintain a database of all the issued certificates signed by the CA.  Also, an incrementing serial number for issued certs can be kept to aid in auditing.  
+In addition to generating keys and certificates and handling signing requests, OpenSSL can maintain a database of all the issued certificates signed by the CA.  Also, an incrementing serial number for issued certs can be kept to aid in auditing.  The database of issued certs and the serial number state are stored in text files alongside the certificates they describe, and these files will need to be preserved together with the CA certificates.
 
-The database of issued certs and the serial number state are stored in text files alongside the certificates they describe, and these files will need to be preserved together with the CA certificates.  To do so, we'll generate one archive of the entire CA working set (`ca_authority.tar.gz`), and another for just the subset of files defining the intermediate certificate (`intermediate_authority.tar.gz`).  These archives can then be backed up and stored in safe locations in between uses.
+To do so, we'll generate one archive of the entire CA working set (`ca_authority.tar.gz`), and another for just the subset of files defining the intermediate certificate (`intermediate_authority.tar.gz`).  These archives can then be backed up and stored in separate safe locations between uses.
 
 # Setting Up a Docker Working Environment
 In order to provide a self-contained repeatable infrastructure for operating the CA, we'll use Docker containers with the necessary tools pre-installed.  These containers can be destroyed and regenerated between CA duties, *as long as we're careful to archive the work done at the end of each session*.  We'll cover the details of doing so later in this guide.

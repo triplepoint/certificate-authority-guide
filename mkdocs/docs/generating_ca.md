@@ -1,42 +1,60 @@
----
-title: Generating a new Certificate Authority
-toc: true
----
+# A Note on the OpenSSL Config Files
+We've provided a copy of the openssl config file in both the `/root/ca` and `/root/ca/intermediate` directory.  These files are identical, but they're duplicated to ensure that the intermediate CA archive has its own copy if it's ever used on its own (for example, when signing a service certificate).
+
+We'll be careful to explicitly set the openssl `-config` and `-name` flags appropriately for each scenario, but just be aware these two files are (or at least should be) identical.
 
 # Generating a Root CA Certificate
-The Certificate Authority's core documents are its certificate and the private key used to sign it.  This is the certificate which all clients will directly trust, and its the root of the chain of trust that ultimately extends down to the individual service certificates.
+The Certificate Authority's core documents are its certificate and the associated private key.  This is the certificate which all clients will directly trust, and its the root of the chain of trust that ultimately extends down to the individual service certificates.
 
-You'll likely only need to generate this root certificate once.  We'll set the expiration for 20 years (7300 days), and as long as the certificate isn't compromised you can rely on it to function for that long.
+You'll likely only need to generate this root certificate and its key once.  We'll set the expiration for 20 years (7300 days), and as long as the certificate isn't compromised you can rely on it to function for that long.
 
-## Generate a New Key for the CA Certificate
-You'll want to use a real non-empty password for this key and store it in a safe place, just in case the key file itself is ever compromised.
+## Generate a New Key and Certificate Signing Request for the CA Certificate
+Here we'll generate a new RSA key for the CA certificate, and also a Certificate Signing Request (CSR) which will be define the details of the CA certificate, and which will be used to self-sign the new certificate.
+
+The key will be encrypted with a passphrase, which you'll be prompted to supply.  You'll want to use a real non-empty password for this key and store it in a safe place.
+
+When you are prompted for the CA Certificate Distinguished Name details, take care to get them right.  You won't want to regenerate the certificate after its been distributed.
+
 ``` shell
-openssl genrsa -aes256 -out /root/ca/private/ca.key.pem 4096 && \
-chmod 400 /root/ca/private/ca.key.pem
+openssl req \
+    -config /root/ca/ca_openssl.cnf \
+    -new \
+    -newkey rsa:4096 \
+    -keyout /root/ca/private/ca.key.pem \
+    -out /root/ca/ca.req.pem
 ```
-This generates the new CA certificate key at `/root/ca/private/ca.key.pem`.
+This generates the new CA certificate key at `/root/ca/private/ca.key.pem` and  generates the new CSR for the root certificate at `/root/ca/ca.req.pem`.
 
-## Generate the CA Certificate
+## Self-Sign the Root Certificate
 ``` shell
-openssl req -config /root/ca/ca_openssl.cnf \
-    -key /root/ca/private/ca.key.pem \
-    -new -x509 -days 7300 -sha256 -extensions v3_ca \
-    -out /root/ca/certs/ca.cert.pem && \
-chmod 444 certs/ca.cert.pem
+openssl ca \
+    -config /root/ca/ca_openssl.cnf \
+    -name CA_root \
+    -in /root/ca/ca.req.pem \
+    -create_serial \
+    -out /root/ca/certs/ca.cert.pem \
+    -days 7300 \
+    -keyfile /root/ca/private/ca.key.pem \
+    -selfsign \
+    -extensions v3_ca
 ```
 This generates the new CA certificate at `/root/ca/certs/ca.cert.pem`.
 
-When you are prompted for the CA Certificate Distinguished Name details, take care to get them right.  You won't want to regenerate this CA cert later.
-
-Once complete, you can verify the certificate's configuration with:
+## Verifying the Root Certificate
+Now that the root CA certificate and key are generated, you can verify them with:
 ``` shell
 openssl x509 -noout -text -in /root/ca/certs/ca.cert.pem
 ```
 
+TODO - what are we looking at?
+
 ## Generate a New Key for the Intermediate Certificate
 Just like we did for the CA certificate above:
 ``` shell
-openssl genrsa -aes256 -out /root/ca/intermediate/private/intermediate.key.pem 4096 && \
+openssl genrsa \
+    -aes256 \
+    -out /root/ca/intermediate/private/intermediate.key.pem \
+    4096 && \
 chmod 400 /root/ca/intermediate/private/intermediate.key.pem
 ```
 This generates the new intermediate certificate key at: `/root/ca/intermediate/private/intermediate.key.pem`.
@@ -51,18 +69,23 @@ Note that the `Country Name`, `State or Province Name`, and `Organization Name` 
 Also note that the Common Name used in this CSR _must_ be distinct from the CA certificate's Common Name, used above.
 
 ``` shell
-openssl req -config /root/ca/intermediate/int_openssl.cnf \
+openssl req \
+    -config /root/ca/intermediate/int_openssl.cnf \
     -key /root/ca/intermediate/private/intermediate.key.pem \
-    -new -sha256 \
+    -new \
+    -sha256 \
     -out /root/ca/intermediate/csr/intermediate.csr.pem
 ```
 
 ## Sign the Intermediate Certificate with the CA Certificate
 Answer `y` to any prompts about "commiting", this is about the database of signed certificates that OpenSSL is keeping for us (see below).
 ``` shell
-openssl ca -config /root/ca/ca_openssl.cnf \
+openssl ca \
+    -config /root/ca/ca_openssl.cnf \
     -extensions v3_intermediate_ca \
-    -days 3650 -notext -md sha256 \
+    -days 3650 \
+    -notext \
+    -md sha256 \
     -in /root/ca/intermediate/csr/intermediate.csr.pem \
     -out /root/ca/intermediate/certs/intermediate.cert.pem && \
 chmod 444 /root/ca/intermediate/certs/intermediate.cert.pem
@@ -103,7 +126,7 @@ The above work has generated several files which need to be preserved:
 
 These files need to be packaged and prepared for storage.
 
-We'll package the entire set up into one archive at `/root/ca_authority.tar` which can represent the CA certificate, and which can be stored in a seldom-accessed, higher-security site.  
+We'll package the entire set up into one archive at `/root/ca_authority.tar` which can represent the CA certificate, and which can be stored in a seldom-accessed, higher-security site.
 
 We'll also package the intermediate authority's files into a separate archive at `/root/intermediate_authority.tar`, which can be stored in the more-convenient, less-secure site.
 

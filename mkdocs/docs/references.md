@@ -1,7 +1,3 @@
----
-title: References
----
-
 # References
 - [Jamie Nguyen's _OpenSSL Certificate Authority_](https://jamielinux.com/docs/openssl-certificate-authority/create-the-root-pair.html)
 - [Robert Marcano's _Restrict Certificate Authority to a Domain_](https://www.marcanoonline.com/post/2016/09/restrict-certificate-authority-to-a-domain/)
