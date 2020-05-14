@@ -1,6 +1,6 @@
 site_name: Certificate Authority Guide
 theme: readthedocs
-site_description: A guide to managing a Certificate Authority, as would be used on an internal LAN with private domains.
+site_description: A guide to managing a Certificate Authority, as would be used on a private LAN with private domains.
 site_author: Jonathan Hanson
 repo_url: https://github.com/triplepoint/certificate-authority-guide
 edit_uri: blob/master/mkdocs/docs/
@@ -8,7 +8,7 @@ nav:
   - Introduction: index.md
   - Operational Overview and Setup: details_and_setup.md
   - Generating a Certificate Authority: generating_ca.md
-  - Distribution: distribution.md
+  - Root Certificate Distribution: distribution.md
   - Service Certificates: service_certificates.md
   - Revoking Service Certificates: revocation_services.md
   - Revoking the Intermediate CA Certificate: revocation_ca.md

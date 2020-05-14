@@ -1,6 +1,6 @@
 # OpenSSL root CA configuration file.
 # see:
-# https://www.openssl.org/docs/manmaster/man1/ca.html
+# https://www.openssl.org/docs/man1.1.1/man1/ca.html
 
 # This definition stops the following lines choking if HOME isn't
 # defined.

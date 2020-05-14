@@ -1,19 +1,19 @@
 # A Note on the OpenSSL Config Files
-We've provided a copy of the openssl config file in both the `/root/ca` and `/root/ca/intermediate` directory.  These files are identical, but they're duplicated to ensure that the intermediate CA archive has its own copy if it's ever used on its own (for example, when signing a service certificate).
+Our skeleton working directory contains copy of the openssl config file in both the `/root/ca` and `/root/ca/intermediate` directory.  These files are identical, but they're duplicated to ensure that the intermediate CA archive has its own copy when it's used on its own (for example, when signing a service certificate).
 
-We'll be careful to explicitly set the openssl `-config` and `-name` flags appropriately for each scenario, but just be aware these two files are (or at least should be) identical.
+In the `openssl` commands below, we'll be careful to explicitly set the openssl `-config` and `-name` flags appropriately for each scenario, but just be aware these two files are (or at least should be) identical.
 
 # Generating a Root CA Certificate
-The Certificate Authority's core documents are its certificate and the associated private key.  This is the certificate which all clients will directly trust, and its the root of the chain of trust that ultimately extends down to the individual service certificates.
+The Certificate Authority's core documents are its root certificate and the associated private key.  This is the certificate which all clients will directly trust, and its the root of the chain of trust that ultimately extends down to the individual service certificates.
 
 You'll likely only need to generate this root certificate and its key once.  We'll set the expiration for 20 years (7300 days), and as long as the certificate isn't compromised you can rely on it to function for that long.
 
 ## Generate a New Key and Certificate Signing Request for the CA Certificate
-Here we'll generate a new RSA key for the CA certificate, and also a Certificate Signing Request (CSR) which will be define the details of the CA certificate, and which will be used to self-sign the new certificate.
+Here we'll generate a new RSA key for the CA certificate, and also a Certificate Signing Request (CSR) which will define the details of the CA certificate, and which will be used to self-sign the new certificate.
 
 The key will be encrypted with a passphrase, which you'll be prompted to supply.  You'll want to use a real non-empty password for this key and store it in a safe place.
 
-When you are prompted for the CA Certificate Distinguished Name details, take care to get them right.  You won't want to regenerate the certificate after its been distributed.
+When you are prompted for the CA Certificate Distinguished Name details, take care to get them right.  You won't want to have to regenerate the certificate after its been distributed.
 
 ``` shell
 openssl req \
@@ -23,9 +23,12 @@ openssl req \
     -keyout /root/ca/private/ca.key.pem \
     -out /root/ca/ca.req.pem
 ```
+
 This generates the new CA certificate key at `/root/ca/private/ca.key.pem` and  generates the new CSR for the root certificate at `/root/ca/ca.req.pem`.
 
 ## Self-Sign the Root Certificate
+Now that we have a signing request, we can act on it to self-sign the root certificate:
+
 ``` shell
 openssl ca \
     -config /root/ca/ca_openssl.cnf \
@@ -38,7 +41,7 @@ openssl ca \
     -selfsign \
     -extensions v3_ca
 ```
-This generates the new CA certificate at `/root/ca/certs/ca.cert.pem`.
+This generates the new CA root certificate at `/root/ca/certs/ca.cert.pem`.
 
 ## Verifying the Root Certificate
 Now that the root CA certificate and key are generated, you can verify them with:
@@ -49,7 +52,7 @@ openssl x509 -noout -text -in /root/ca/certs/ca.cert.pem
 TODO - what are we looking at?
 
 ## Generate a New Key for the Intermediate Certificate
-Just like we did for the CA certificate above:
+Just like we did for the CA root certificate above, we need to generate a signing key for the CA intermediate certificate:
 ``` shell
 openssl genrsa \
     -aes256 \
@@ -117,7 +120,8 @@ chmod 444 /root/ca/intermediate/certs/ca-chain.cert.pem
 
 
 # Safe Storage
-The above work has generated several files which need to be preserved:
+The above work has generated several files which so far only exist on this Docker container, and which now need to be preserved:
+
 - The CA certificate and its key file
 - The intermediate certificate and its keyfile
 - A chainfile combining both certs
@@ -126,11 +130,11 @@ The above work has generated several files which need to be preserved:
 
 These files need to be packaged and prepared for storage.
 
-We'll package the entire set up into one archive at `/root/ca_authority.tar` which can represent the CA certificate, and which can be stored in a seldom-accessed, higher-security site.
+We'll package the entire set up into one archive at `/root/ca_authority.tar.gz` which can represent the CA root certificate, and which can be stored in a seldom-accessed, higher-security site.
 
-We'll also package the intermediate authority's files into a separate archive at `/root/intermediate_authority.tar`, which can be stored in the more-convenient, less-secure site.
+We'll also package the intermediate authority's files into a separate archive at `/root/intermediate_authority.tar.gz`, which can be stored in the more-convenient, less-secure site.
 
-Be sure to store both key's passwords somewhere safe as well:
+Be sure to store both keys' passwords somewhere safe as well:
 ``` shell
 tar -czvf /root/ca_authority.tar.gz -C /root/ca/ .
 cp /root/ca_authority.tar.gz /root/ca_persist
@@ -139,7 +143,7 @@ tar -czvf /root/intermediate_authority.tar.gz -C /root/ca/intermediate/ .
 cp /root/intermediate_authority.tar.gz /root/ca_persist
 ```
 
-Because this "export" behavior is critical, the above shell commands are also provided on the Docker image as ascript named `archive_ca`:
+Because this "export" behavior is critical, the above shell commands are also provided on the Docker image as ascript named [`archive_ca`](https://github.com/triplepoint/certificate-authority-guide/blob/master/src/scripts/archive_ca):
 ``` shell
 archive_ca
 ```

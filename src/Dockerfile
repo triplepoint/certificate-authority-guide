@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 LABEL maintainer="Jonathan Hanson <jonathan@jonathan-hanson.org>"
 
 # The path on the container where CA archives are written and read
