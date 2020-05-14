@@ -19,4 +19,4 @@ In summary, we want:
 
 - Various SSL/TLS service certificates for each of the production services on the internal network, signed by the intermediate CA certificate.
 
-The rest of this guide will go into detail on how to accomplish these goals, and some advice on maintaining it with a minimum of hassle.
+The rest of this guide will go into detail on how to accomplish these goals, and some advice on maintaining it all with a minimum of hassle.
