@@ -131,16 +131,16 @@ cd certificate-authority-guide/src
 
 <p>Then build the <a href="https://github.com/triplepoint/certificate-authority-guide/blob/master/src/Dockerfile"><code>Dockerfile</code></a> into a Docker image and create a Docker instance from that image with the typical Docker commands:</p>
 <pre><code class="shell"># Generate a Docker image from the provided Dockerfile
-docker build -t &quot;ca-certificate-tools:latest&quot; .
+docker build -t &quot;certificate-authority-tools:latest&quot; .
 
 # Create a shared directory for exposing the CA archives inside the container
-mkdir -p ./archives
+mkdir archives
 
 # Start a Docker container from the image we generated above, with a mounted
 # volume into the shared directory we created above
 docker run -it --rm  \
     --mount type=bind,source=&quot;$(pwd)/archives&quot;,target=&quot;/root/ca_persist&quot; \
-    ca-certificate-tools:latest
+    certificate-authority-tools:latest
 </code></pre>
 
 <p>In the above <code>docker run</code> command, the <code>--mount</code> parameter is defining a local <code>source</code> directory (<code>./archives</code>) to mount as <code>/root/ca_persist</code> inside the Docker container.  This directory, shared between the host machine and the Docker container, is how we'll move the CA archives in and out of the container.</p>
@@ -149,7 +149,36 @@ docker run -it --rm  \
 <p>Remember, it's your responsibility to ensure that new work done inside the Docker container is archived <em>before</em> the container is exited and destroyed.  We'll explain more about how to do this later in this guide.</p>
 <p>Note that in the command example above, we're creating a local <code>./archives</code> directory to use as the <code>source</code> archive directory on the host.  You could instead provide the path to a mounted USB drive and avoid copying the archives onto your computer.  Be aware that Docker requires that path to be an absolute path.</p>
 <p>Be sure not to omit the <code>--rm</code> flag; this container will generate confidential files, and we want to destroy it once we're done working inside the container and have safely re-created the archives.</p>
-<p>Unless specified otherwise, the commands in the rest of this guide are executed inside the context of this Docker container's bash shell.</p>
+<h1 id="verification">Verification</h1>
+<p>Before we move on to setting up our Certificate Authority, go ahead and run the commands above and ensure that you've got a command prompt inside the Docker container.  You can verify things are set up properly by running the <code>pwd</code> and <code>tree</code> commands to see which directory you're in, and whether the skeleton root CA authority is set up:</p>
+<pre><code class="bash">root@b802e56f10b6:~/ca# pwd
+/root/ca
+root@b802e56f10b6:~/ca# tree
+.
+|-- ca_openssl.cnf
+|-- certs
+|-- crl
+|-- crlnumber
+|-- csr
+|-- index.txt
+|-- intermediate
+|   |-- ca_openssl.cnf
+|   |-- certs
+|   |-- crl
+|   |-- crlnumber
+|   |-- csr
+|   |-- index.txt
+|   |-- newcerts
+|   |-- private
+|   `-- serial
+|-- newcerts
+|-- private
+`-- serial
+
+11 directories, 8 files
+</code></pre>
+
+<p>Unless specified otherwise, the commands in the rest of this guide are executed inside the context of this Docker image.</p>
               
             </div>
           </div>
