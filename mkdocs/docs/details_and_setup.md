@@ -20,16 +20,16 @@ cd certificate-authority-guide/src
 Then build the [`Dockerfile`](https://github.com/triplepoint/certificate-authority-guide/blob/master/src/Dockerfile) into a Docker image and create a Docker instance from that image with the typical Docker commands:
 ``` shell
 # Generate a Docker image from the provided Dockerfile
-docker build -t "ca-certificate-tools:latest" .
+docker build -t "certificate-authority-tools:latest" .
 
 # Create a shared directory for exposing the CA archives inside the container
-mkdir -p ./archives
+mkdir archives
 
 # Start a Docker container from the image we generated above, with a mounted
 # volume into the shared directory we created above
 docker run -it --rm  \
     --mount type=bind,source="$(pwd)/archives",target="/root/ca_persist" \
-    ca-certificate-tools:latest
+    certificate-authority-tools:latest
 ```
 
 In the above `docker run` command, the `--mount` parameter is defining a local `source` directory (`./archives`) to mount as `/root/ca_persist` inside the Docker container.  This directory, shared between the host machine and the Docker container, is how we'll move the CA archives in and out of the container.
@@ -44,4 +44,35 @@ Note that in the command example above, we're creating a local `./archives` dire
 
 Be sure not to omit the `--rm` flag; this container will generate confidential files, and we want to destroy it once we're done working inside the container and have safely re-created the archives.
 
-Unless specified otherwise, the commands in the rest of this guide are executed inside the context of this Docker container's bash shell.
+# Verification
+Before we move on to setting up our Certificate Authority, go ahead and run the commands above and ensure that you've got a command prompt inside the Docker container.  You can verify things are set up properly by running the `pwd` and `tree` commands to see which directory you're in, and whether the skeleton root CA authority is set up:
+
+``` bash
+root@b802e56f10b6:~/ca# pwd
+/root/ca
+root@b802e56f10b6:~/ca# tree
+.
+|-- ca_openssl.cnf
+|-- certs
+|-- crl
+|-- crlnumber
+|-- csr
+|-- index.txt
+|-- intermediate
+|   |-- ca_openssl.cnf
+|   |-- certs
+|   |-- crl
+|   |-- crlnumber
+|   |-- csr
+|   |-- index.txt
+|   |-- newcerts
+|   |-- private
+|   `-- serial
+|-- newcerts
+|-- private
+`-- serial
+
+11 directories, 8 files
+```
+
+Unless specified otherwise, the commands in the rest of this guide are executed inside the context of this Docker image.

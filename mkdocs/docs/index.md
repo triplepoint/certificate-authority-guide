@@ -21,4 +21,4 @@ In summary, we want:
 
 In addition, we'd like some process and tooling for securely and conveniently managing our new Certificate Authority.  Ideally, this would be a small set of archive files we could securely store offline, and some stateless tooling scripts that can operate on those archives to perform the various certificate maintenance tasks.
 
-The rest of this guide will go into detail on how to accomplish these goals, and some advice on maintaining it with a minimum of hassle.
+The rest of this guide will go into detail on how to accomplish these goals, and some advice on maintaining it all with a minimum of hassle.
