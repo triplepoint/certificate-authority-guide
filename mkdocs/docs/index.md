@@ -9,7 +9,7 @@ In order to mitigate this risk, we'd like to limit the CA such that its trust on
 
 In addition, we'd like to find a balance between convenience and security when it comes to handling the CA's confidential files.  To do so while still enabling convenient signing of new service certificates, we'll create an intermediate certificate signed by the root CA certificate, which is then used for signing the various web service certificates.
 
-This structuring of the CA into a root and an intermediate certificate will allow us to avoid the need for frequent access to the root CA certificate's key.  For example, the root certificate's control files can be locked away in a safe on a USB drive.  This division will also give us a trusted fallback position from which to revoke the intermediate CA certificate if it were compromised.  And finally, the intermediate certificate can have a relatively short expiration date, with a replacement intermediate certificate being rotated into usage near the existing one's end of life, without having to re-issue a trusted certificate for all the clients.
+This structuring of the CA into a root and an intermediate certificate will allow us to avoid the need for frequent access to the root CA certificate's key.  For example, the root certificate's control files can be locked away in a safe on a USB drive.  This division will also give us a trusted fallback position from which to revoke the intermediate CA certificate if it were compromised.  And finally, the intermediate certificate can have a relatively short expiration date, with a replacement intermediate certificate being rotated into usage near the existing one's end of life, without having to redistribute a trusted certificate for all the clients.
 
 In summary, we want:
 

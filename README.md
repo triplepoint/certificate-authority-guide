@@ -8,7 +8,7 @@ This repository contains documentation for running your own limited certificate 
 The `/mkdocs` folder contains a [MkDocs](https://www.mkdocs.org) project, suitable for being built and published to GitHub Pages.
 
 Assuming you have Python and `pipenv` installed, you can launch a local development server with:
-``` shell
+``` bash
 git clone git@github.com:triplepoint/certificate-authority-guide.git
 
 cd certificate-authority-guide
@@ -23,7 +23,7 @@ You can then go to http://127.0.0.1:8000 to see the page locally rendered.  Edit
 
 # Doc Deployment
 Per MkDocs documentation, you can deploy this project with:
-``` shell
+``` bash
 mkdocs gh-deploy
 ```
 

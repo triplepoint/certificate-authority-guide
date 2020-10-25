@@ -1,5 +1,9 @@
 site_name: Certificate Authority Guide
-theme: readthedocs
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - bash
 site_description: A guide to managing a Certificate Authority, as would be used on a private LAN with private domains.
 site_author: Jonathan Hanson
 repo_url: https://github.com/triplepoint/certificate-authority-guide

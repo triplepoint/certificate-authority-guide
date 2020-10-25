@@ -1,5 +1,5 @@
 # Operational Overview
-The [OpenSSL command line tool](https://www.openssl.org/docs/man1.1.0/apps/openssl.html) is the intimidating Swiss Army knife that performs practically all of the functions necessary for running a CA.  We'll only use a fraction of its features for this project.
+The [OpenSSL command line tool](https://www.openssl.org/docs/man1.1.1/man1/openssl.html) is the intimidating Swiss Army knife that performs practically all of the functions necessary for running a CA.  We'll only use a fraction of its features for this project.
 
 In addition to generating keys and certificates and handling signing requests, OpenSSL can maintain a database of all the issued certificates signed by the CA.  Also, an incrementing serial number for issued certs can be kept to aid in auditing.  The database of issued certs and the serial number state are stored in text files alongside the certificates they describe, and these files will need to be preserved together with the CA certificates.
 
@@ -11,14 +11,14 @@ In order to provide a self-contained repeatable infrastructure for operating the
 Setting up a Docker host environment on your computer is beyond the scope of this document, but it's not especially difficult.  A good place to start is the [Docker Community Edition website](https://www.docker.com/community-edition).
 
 Once you've got Docker installed, clone this site's code repository to a working directory:
-``` shell
+``` bash
 git clone https://github.com/triplepoint/certificate-authority-guide
 
 cd certificate-authority-guide/src
 ```
 
 Then build the [`Dockerfile`](https://github.com/triplepoint/certificate-authority-guide/blob/master/src/Dockerfile) into a Docker image and create a Docker instance from that image with the typical Docker commands:
-``` shell
+``` bash
 # Generate a Docker image from the provided Dockerfile
 docker build -t "certificate-authority-tools:latest" .
 

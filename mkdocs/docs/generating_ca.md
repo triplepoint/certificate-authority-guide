@@ -15,7 +15,7 @@ The key will be encrypted with a passphrase, which you'll be prompted to supply.
 
 When you are prompted for the CA Certificate Distinguished Name details, take care to get them right.  You won't want to regenerate the certificate after it's been distributed.
 
-``` shell
+``` bash
 openssl req \
     -config /root/ca/ca_openssl.cnf \
     -new \
@@ -29,7 +29,7 @@ This generates the new CA certificate key at `/root/ca/private/ca.key.pem` and  
 ## Self-Sign the Root Certificate
 Now that we have a signing request, we can act on it to self-sign the root certificate:
 
-``` shell
+``` bash
 openssl ca \
     -config /root/ca/ca_openssl.cnf \
     -name CA_root \
@@ -45,7 +45,7 @@ This generates the new CA root certificate at `/root/ca/certs/ca.cert.pem`.
 
 ## Verifying the Root Certificate
 Now that the root CA certificate and key are generated, you can verify them with:
-``` shell
+``` bash
 openssl x509 -noout -text -in /root/ca/certs/ca.cert.pem
 ```
 
@@ -53,7 +53,7 @@ TODO - what are we looking at?
 
 ## Generate a New Key for the Intermediate Certificate
 Just like we did for the CA root certificate above, we need to generate a signing key for the CA intermediate certificate:
-``` shell
+``` bash
 openssl genrsa \
     -aes256 \
     -out /root/ca/intermediate/private/intermediate.key.pem \
@@ -71,7 +71,7 @@ Note that the `Country Name`, `State or Province Name`, and `Organization Name` 
 
 Also note that the Common Name used in this CSR _must_ be distinct from the CA certificate's Common Name, used above.
 
-``` shell
+``` bash
 openssl req \
     -config /root/ca/intermediate/int_openssl.cnf \
     -key /root/ca/intermediate/private/intermediate.key.pem \
@@ -82,7 +82,7 @@ openssl req \
 
 ## Sign the Intermediate Certificate with the CA Certificate
 Answer `y` to any prompts about "commiting", this is about the database of signed certificates that OpenSSL is keeping for us (see below).
-``` shell
+``` bash
 openssl ca \
     -config /root/ca/ca_openssl.cnf \
     -extensions v3_intermediate_ca \
@@ -96,12 +96,12 @@ chmod 444 /root/ca/intermediate/certs/intermediate.cert.pem
 This generates the new Intermdiate certificate at: `/root/ca/intermediate/certs/intermediate.cert.pem`.
 
 Once generated, you can verify the certificate's values with:
-``` shell
+``` bash
 openssl x509 -noout -text -in /root/ca/intermediate/certs/intermediate.cert.pem
 ```
 
 And you can verify the intermediate certificate's chain of trust against the CA certificate is valid with:
-``` shell
+``` bash
 openssl verify -CAfile /root/ca/certs/ca.cert.pem \
     /root/ca/intermediate/certs/intermediate.cert.pem
 ```
@@ -111,7 +111,7 @@ openssl verify -CAfile /root/ca/certs/ca.cert.pem \
 It's often convenient to have a combined "chain file" for a given service certificate's chain of trust back to a trusted root certificate.  Many SSL/TLS configurations expect to have these files.
 
 These chain files are simply the concatenated set of all the certificates in the chain of trust which lead back to the trusted CA root certificate:
-``` shell
+``` bash
 cat /root/ca/intermediate/certs/intermediate.cert.pem \
     /root/ca/certs/ca.cert.pem > \
     /root/ca/intermediate/certs/ca-chain.cert.pem && \
@@ -135,7 +135,7 @@ We'll package the entire set up into one archive at `/root/ca_authority.tar.gz` 
 We'll also package the intermediate authority's files into a separate archive at `/root/intermediate_authority.tar.gz`, which can be stored in the more-convenient, less-secure site.
 
 Be sure to store both keys' passwords somewhere safe as well:
-``` shell
+``` bash
 tar -czvf /root/ca_authority.tar.gz -C /root/ca/ .
 cp /root/ca_authority.tar.gz /root/ca_persist
 
@@ -144,6 +144,6 @@ cp /root/intermediate_authority.tar.gz /root/ca_persist
 ```
 
 Because this "export" behavior is critical, the above shell commands are also provided on the Docker image as ascript named [`archive_ca`](https://github.com/triplepoint/certificate-authority-guide/blob/master/src/scripts/archive_ca):
-``` shell
+``` bash
 archive_ca
 ```
