@@ -9,25 +9,25 @@
   <meta name="author" content="Jonathan Hanson">
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Revoking the Intermediate CA Certificate - Certificate Authority Guide</title>
+  <title>Revoking Certificates - Certificate Authority Guide</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
   <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Revoking the Intermediate CA Certificate";
-    var mkdocs_page_input_path = "revocation_ca.md";
+    var mkdocs_page_name = "Revoking Certificates";
+    var mkdocs_page_input_path = "revocation_certificates.md";
     var mkdocs_page_url = null;
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -41,7 +41,7 @@
         <a href=".." class="icon icon-home"> Certificate Authority Guide</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -67,13 +67,13 @@
                     <li class="toctree-l1"><a class="reference internal" href="../service_certificates/">Service Certificates</a>
                     </li>
                 </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../revocation_services/">Revoking Service Certificates</a>
-                    </li>
-                </ul>
                 <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Revoking the Intermediate CA Certificate</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Revoking Certificates</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#revoking-service-certificates">Revoking Service Certificates</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#revoking-the-intermediate-ca-certificate">Revoking the Intermediate CA Certificate</a>
+    </li>
     </ul>
                     </li>
                 </ul>
@@ -102,10 +102,10 @@
     
       
     
-    <li>Revoking the Intermediate CA Certificate</li>
+    <li>Revoking Certificates</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/triplepoint/certificate-authority-guide/blob/master/mkdocs/docs/revocation_ca.md"
+        <a href="https://github.com/triplepoint/certificate-authority-guide/blob/master/mkdocs/docs/revocation_certificates.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -113,11 +113,27 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
-                <h1 id="revoking-the-intermediate-certificate">Revoking the Intermediate Certificate</h1>
-<p>TODO</p>
+                <h1 id="revoking-a-ssltls-service-certificate">Revoking a SSL/TLS Service Certificate</h1>
+<p>TODO - cover:</p>
+<h2 id="revoking-service-certificates">Revoking Service Certificates</h2>
+<ul>
+<li>What does it mean to revoke a service certificate</li>
+<li>Why would you want to revoke a service certificate?</li>
+<li>What's the basic concept of how this works?</li>
+<li>How do you actually do it?</li>
+</ul>
+<h2 id="revoking-the-intermediate-ca-certificate">Revoking the Intermediate CA Certificate</h2>
+<ul>
+<li>What about revoking the intermediate certificate?<ul>
+<li>Note that you'd also be revoking all the certificates that it signed</li>
+<li>Get the list of all the certificates that were signed by the intermediate certificate</li>
+</ul>
+</li>
+</ul>
               
             </div>
           </div>
@@ -128,7 +144,7 @@
         <a href="../references/" class="btn btn-neutral float-right" title="References">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../revocation_services/" class="btn btn-neutral" title="Revoking Service Certificates"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../service_certificates/" class="btn btn-neutral" title="Service Certificates"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -151,19 +167,22 @@
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/triplepoint/certificate-authority-guide/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../revocation_services/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../references/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/triplepoint/certificate-authority-guide/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../service_certificates/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../references/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
       <script src="../search/main.js" defer></script>
     <script defer>

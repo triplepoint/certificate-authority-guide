@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="css/theme.css" />
   <link rel="stylesheet" href="css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   
   <script>
     // Current page data
@@ -25,9 +25,9 @@
   
   <script src="js/jquery-2.1.1.min.js" defer></script>
   <script src="js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -41,7 +41,7 @@
         <a href="." class="icon icon-home"> Certificate Authority Guide</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -70,11 +70,7 @@
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="revocation_services/">Revoking Service Certificates</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="revocation_ca/">Revoking the Intermediate CA Certificate</a>
+                    <li class="toctree-l1"><a class="reference internal" href="revocation_certificates/">Revoking Certificates</a>
                     </li>
                 </ul>
                 <ul>
@@ -113,16 +109,17 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
                 <h1 id="introduction">Introduction</h1>
-<p>A typical office or enthusiast LAN will have several web services hosted internally, with private domain names resolved by a private DNS server.  We'd like these services to use HTTPS, with SSL/TLS certificates which have valid chains of trust, but for privacy and cost reasons we don't want to get a real-world Certificate Authority (CA) involved in issuing our private service certificates.</p>
-<p>The solution is to create our own CA and sign our own service certificates.  This entity will represent a new root point of trust which our services' clients can explicitly accept, and which can delegate its trust to the various internal web service SSL/TLS certificates.</p>
+<p>A typical office or enthusiast LAN will have several web services hosted privately, with private domain names resolved by a private DNS server.  We'd like these services to use HTTPS, with SSL/TLS certificates which have valid chains of trust, but for privacy and cost reasons we don't want to get a real-world Certificate Authority (CA) involved in issuing our private service certificates.</p>
+<p>The solution is to create our own CA and sign our own service certificates.  This entity will represent a new root point of trust which our services' clients can explicitly accept, and which can delegate its trust to our various private SSL/TLS service certificates.</p>
 <p>However, this plan has important implications for security and privacy.  Trusting any CA implies that any certificate signed by that CA is also trusted.  This broad trust could be exploited to issue fraudulent certificates for 3rd party domains if the agency which controls the CA chose to undermine the privacy and security of the clients who trusted it, or if the CA certificate and key were simply stolen.</p>
 <p>In order to mitigate this risk, we'd like to limit the CA such that its trust only extends to domains which match a given whitelist.  Clients can then verify this condition by inspecting the CA certificate before trusting it and be assured that, at worst, their risk extends only to a limited set of domains.</p>
-<p>In addition, we'd like to find a balance between convenience and security when it comes to handling the CA's confidential files.  To do so while still enabling convenient signing of new service certificates, we'll create an intermediate certificate signed by the root CA certificate, which is then used for signing the various web service certificates.</p>
-<p>This structuring of the CA into a root and an intermediate certificate will allow us to avoid the need for frequent access to the root CA certificate's key.  For example, the root certificate's control files can be locked away in a safe on a USB drive.  This division will also give us a trusted fallback position from which to revoke the intermediate CA certificate if it were compromised.  And finally, the intermediate certificate can have a relatively short expiration date, with a replacement intermediate certificate being rotated into usage near the existing one's end of life, without having to re-issue a trusted certificate for all the clients.</p>
+<p>In addition, we'd like to find a balance between convenience and security when it comes to handling the CA's confidential files.  To do so while still enabling convenient signing of new service certificates, we'll create an intermediate certificate signed by the root CA certificate, which is then used for signing the various service certificates.</p>
+<p>This structuring of the CA into a root and an intermediate certificate will allow us to avoid the need for frequent access to the root CA certificate's key.  For example, the root certificate's control files can be locked away in a safe on a USB drive.  This division will also give us a trusted fallback position from which to revoke the intermediate CA certificate if it were compromised.  And finally, the intermediate certificate can have a relatively short expiration date, with a replacement intermediate certificate being rotated into usage near the existing one's end of life, without having to redistribute a trusted certificate for all the clients.</p>
 <p>In summary, we want:</p>
 <ul>
 <li>
@@ -132,10 +129,19 @@
 <p>An intermediate CA certificate, signed by the root CA certificate.</p>
 </li>
 <li>
-<p>Various SSL/TLS service certificates for each of the production services on the private network, signed by the intermediate CA certificate.</p>
+<p>Various SSL/TLS service certificates for each of our services on the private network, signed by the intermediate CA certificate.</p>
 </li>
 </ul>
-<p>In addition, we'd like some process and tooling for securely and conveniently managing our new Certificate Authority.  Ideally, this would be a small set of archive files we could securely store offline, and some stateless tooling scripts that can operate on those archives to perform the various certificate maintenance tasks.</p>
+<p>In addition, we'd like some process and tooling for securely and conveniently managing our new Certificate Authority. Specifically, we want to know how to:</p>
+<ul>
+<li>Generate our new CA root certificate from scratch</li>
+<li>Distribute the CA root certificate for clients to trust</li>
+<li>Generate and later re-generate our intermediate certificate</li>
+<li>Sign new service certificates and periodically replace expiring service certificates</li>
+<li>Revoke certificates that are no longer considered valid</li>
+<li>Store the root and intermediate CA certificates in a safe manner</li>
+</ul>
+<p>Ideally, this would be a small set of archive files we could securely store offline, and some stateless tooling scripts that can operate on those archives to perform the various certificate maintenance tasks.</p>
 <p>The rest of this guide will go into detail on how to accomplish these goals, and some advice on maintaining it all with a minimum of hassle.</p>
               
             </div>
@@ -168,17 +174,20 @@
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/triplepoint/certificate-authority-guide/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-      
-        <span style="margin-left: 15px"><a href="details_and_setup/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/triplepoint/certificate-authority-guide/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="details_and_setup/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
     <script src="js/theme.js" defer></script>
       <script src="search/main.js" defer></script>
     <script defer>
@@ -191,6 +200,6 @@
 </html>
 
 <!--
-MkDocs version : 1.1
-Build Date UTC : 2020-05-17 20:39:32
+MkDocs version : 1.2.3
+Build Date UTC : 2021-11-14 00:12:19.717958+00:00
 -->
