@@ -1,4 +1,4 @@
-# FROM: https://raw.githubusercontent.com/openssl/openssl/OpenSSL_1_1_1f/apps/openssl.cnf
+# FROM: https://raw.githubusercontent.com/openssl/openssl/OpenSSL_1_1_1l/apps/openssl.cnf
 
 #
 # OpenSSL example configuration file.

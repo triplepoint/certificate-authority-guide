@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:impish
 LABEL maintainer="Jonathan Hanson <jonathan@jonathan-hanson.org>"
 
 # The path on the container to which the persistent archive directory is mounted
@@ -22,7 +22,7 @@ ENV OPENSSL_CNF_PATH /opt/ca/ca_openssl.cnf
 VOLUME ["$CA_ARCHIVE_DIR"]
 
 # Install the tools we'll need
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install --yes \
         openssl \
         tree \
         vim \
