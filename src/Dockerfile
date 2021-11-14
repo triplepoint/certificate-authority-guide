@@ -36,6 +36,10 @@ COPY conf/ca_openssl.cnf $OPENSSL_CNF_PATH
 COPY scripts/archive_ca /usr/local/bin/archive_ca
 RUN chmod 755 /usr/local/bin/archive_ca
 
+# A quick helper script for generating archives
+COPY scripts/verify_archive /usr/local/bin/verify_archive
+RUN chmod 755 /usr/local/bin/verify_archive
+
 # The script to execute as soon as the container is created
 COPY scripts/entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# Temporary working directory to unpack the current archives, for comparison
+TEMP_DIR=$(mktemp -d)
+if [ -z "${TEMP_DIR}" ]; then
+    echo "ERROR: temporary directory was not created, erroring"
+    exit 1
+fi
+
+# Run the docker entrypoint script which unpacks the archives, but substitute the temp directory
+CA_WORKING_DIR=${TEMP_DIR} /entrypoint.sh > /dev/null
+
+# Compare the working copy with the archived copy
+diff -qr ${TEMP_DIR} ${CA_WORKING_DIR} > /dev/null
+RESULT=$?
+
+# exit with the diff's error code
+if [ "${RESULT}" -eq 0 ]; then
+    echo "Working copy matches the archives, it's safe to exit this container."
+else
+    echo -e "WARNING: The working copy does not match the archives, exiting the container will result in lost work!"
+    echo -e "If you're sure the changes in the working copy should be kept, you can run 'archive_ca' to update the"
+    echo -e "archives with the working copy's changes.\n"
+    diff -r ${TEMP_DIR} ${CA_WORKING_DIR}
+fi
+
+# Remove the temporary directory we created
+rm -rf ${TEMP_DIR}
+
+exit ${RESULT}

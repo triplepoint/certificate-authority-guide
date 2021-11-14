@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # The path on the host to the persistent archives store.  Note that this should be an absolute path,
 # as Docker requires
