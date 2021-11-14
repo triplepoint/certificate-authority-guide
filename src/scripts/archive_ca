@@ -1,8 +1,22 @@
 #!/usr/bin/env bash
 set -e
 
-# TODO rotate the existing archive to a backup, so we're not potentially destroying important data
+# Check: If the CA archive is present, are the openssl config files identical?
+if [ -d ${CA_WORKING_DIR}/private ]; then
+    if ! cmp ${CA_WORKING_DIR}/ca_openssl.cnf ${CA_WORKING_DIR}/intermediate/ca_openssl.cnf > /dev/null 2>&1; then
+        echo "ERROR: root and intermediate copies of ca_openssl.cnf do not match, please sync any changes"
+        exit 1
+    fi
+fi
 
-# Archive the entire CA, and also just the intermediate CA
-tar -czvf /root/ca_persist/ca_authority.tar.gz -C /root/ca/ .
-tar -czvf /root/ca_persist/intermediate_authority.tar.gz -C /root/ca/intermediate/ .
+# If the Root CA is present, archive it
+if [ -d ${CA_WORKING_DIR}/private ]; then
+    # TODO rotate the existing archive to a backup, so we're not potentially destroying important data
+    echo "Archiving root certificate authority..."
+    tar -czvf ${CA_ARCHIVE_DIR}/${CA_ROOT_ARCHIVE_FILENAME} -C ${CA_WORKING_DIR} .
+fi
+
+# Always create an additional archive of just the intermediate certificate
+# TODO rotate the existing archive to a backup, so we're not potentially destroying important data
+echo -e "\nArchiving intermediate certificate..."
+tar -czvf ${CA_ARCHIVE_DIR}/${CA_INTERMEDIATE_ARCHIVE_FILENAME} -C ${CA_WORKING_DIR}/intermediate/ .

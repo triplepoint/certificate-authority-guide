@@ -14,6 +14,5 @@ nav:
   - Generating a Certificate Authority: generating_ca.md
   - Root Certificate Distribution: distribution.md
   - Service Certificates: service_certificates.md
-  - Revoking Service Certificates: revocation_services.md
-  - Revoking the Intermediate CA Certificate: revocation_ca.md
+  - Revoking Certificates: revocation_certificates.md
   - References: references.md

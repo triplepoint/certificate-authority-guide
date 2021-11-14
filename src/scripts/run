@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# The path on the host to the persistent archives store.  Note that this should be an absolute path,
+# as Docker requires
+ARCHIVE_DIR_NAME="$(pwd)/archives"
+
+# The path on the container to which the persistent archive directory is mounted
+# Note that this must match the define in the Dockerfile
+CA_ARCHIVE_DIR="/root/ca_persist"
+
+
+# Generate a Docker image from the provided Dockerfile
+docker build -t "certificate-authority-tools:latest" .
+
+# Create a working directory on the host machine, for sharing the CA archives into the container
+if [ -d ${ARCHIVE_DIR_NAME} ]; then
+    echo "Archive working directory already exists, skipping creation."
+else
+    mkdir ${ARCHIVE_DIR_NAME}
+fi
+
+# Start a Docker container from the image we generated above, with the archive directory shared
+docker run -it --rm  \
+    --mount type=bind,source="${ARCHIVE_DIR_NAME}",target="${CA_ARCHIVE_DIR}" \
+    certificate-authority-tools:latest
