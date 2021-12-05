@@ -3,7 +3,7 @@
 # Temporary working directory to unpack the current archives, for comparison
 TEMP_DIR=$(mktemp -d)
 if [ -z "${TEMP_DIR}" ]; then
-    echo "ERROR: temporary directory was not created, erroring"
+    echo "*** ERROR: temporary directory was not created, erroring"
     exit 1
 fi
 
@@ -16,11 +16,11 @@ RESULT=$?
 
 # exit with the diff's error code
 if [ "${RESULT}" -eq 0 ]; then
-    echo "Working copy matches the archives, it's safe to exit this container."
+    echo "--- Working copy matches the archives, it's safe to exit this container."
 else
-    echo -e "WARNING: The working copy does not match the archives, exiting the container will result in lost work!"
-    echo -e "If you're sure the changes in the working copy should be kept, you can run 'archive_ca' to update the"
-    echo -e "archives with the working copy's changes.\n"
+    echo -e "*** WARNING: The working copy does not match the archives, exiting the container will result in lost work!"
+    echo -e "*** If you're sure the changes in the working copy should be kept, you can run 'archive_ca' to update the"
+    echo -e "*** archives with the working copy's changes.\n"
     diff -r ${TEMP_DIR} ${CA_WORKING_DIR}
 fi
 

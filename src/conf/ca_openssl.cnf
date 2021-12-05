@@ -12,21 +12,21 @@ RANDFILE		= $ENV::HOME/.rnd
 default_ca	= CA_default		# The default ca section
 
 ####################################################################
-[ CA_root ]
+[ CA_default ]
 # Configuration for the Root Certificate Authority.
 
 # Directory and file locations.
 dir               = $ENV::CA_WORKING_DIR
 certs             = $dir/certs
 crl_dir           = $dir/crl
-new_certs_dir     = $dir/newcerts
 database          = $dir/index.txt
+new_certs_dir     = $dir/newcerts
 serial            = $dir/serial
 RANDFILE          = $dir/private/.rand
 
 # The root key and root certificate.
-private_key       = $dir/private/ca.key.pem
 certificate       = $dir/certs/ca.cert.pem
+private_key       = $dir/private/ca.key.pem
 
 # For certificate revocation lists.
 crlnumber         = $dir/crlnumber
@@ -50,14 +50,14 @@ policy            = policy_match
 dir               = $ENV::CA_WORKING_DIR/intermediate
 certs             = $dir/certs
 crl_dir           = $dir/crl
-new_certs_dir     = $dir/newcerts
 database          = $dir/index.txt
+new_certs_dir     = $dir/newcerts
 serial            = $dir/serial
 RANDFILE          = $dir/private/.rand
 
 # The root key and root certificate.
-private_key       = $dir/private/intermediate.key.pem
 certificate       = $dir/certs/intermediate.cert.pem
+private_key       = $dir/private/intermediate.key.pem
 
 # For certificate revocation lists.
 crlnumber         = $dir/crlnumber

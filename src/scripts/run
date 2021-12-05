@@ -9,13 +9,15 @@ ARCHIVE_DIR_NAME="$(pwd)/archives"
 # Note that this must match the define in the Dockerfile
 CA_ARCHIVE_DIR="/root/ca_persist"
 
+echo -e "--- Building Certificate Authority management environment Docker container...\n"
+
 
 # Generate a Docker image from the provided Dockerfile
 docker build -t "certificate-authority-tools:latest" .
 
 # Create a working directory on the host machine, for sharing the CA archives into the container
 if [ -d ${ARCHIVE_DIR_NAME} ]; then
-    echo "Archive working directory already exists, skipping creation."
+    echo -e "\n--- Certificate Authority management archive working directory already exists, skipping creation.\n"
 else
     mkdir ${ARCHIVE_DIR_NAME}
 fi

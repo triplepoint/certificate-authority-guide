@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install --yes \
         openssl \
         tree \
         vim \
+        nano \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy over the stock prepared OpenSSL config file
