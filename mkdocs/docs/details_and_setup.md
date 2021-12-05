@@ -13,13 +13,11 @@ Setting up a Docker host environment on your computer is beyond the scope of thi
 Once you've got Docker installed, clone this site's code repository to a working directory:
 ``` bash
 git clone https://github.com/triplepoint/certificate-authority-guide
-
-cd certificate-authority-guide/src
 ```
 
 Then with the provided helper script, build the [`Dockerfile`](https://github.com/triplepoint/certificate-authority-guide/blob/master/src/Dockerfile) into a Docker image and launch a Docker instance from that image:
 ``` bash
-./scripts/run
+./src/scripts/run
 ```
 
 If you inspect the above `run` script, in the `docker run` command, the `--mount` parameter is defining a local `source` directory (`./archives`) to mount as `/root/ca_persist` inside the Docker container.  This directory, shared between the host machine and the Docker container, is how we'll preserve the CA archives after we terminate the container.
